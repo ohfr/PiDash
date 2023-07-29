@@ -1,0 +1,10 @@
+[Unit]
+Description=PiDash
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/home/pi/Documents/pidash/dash.py
+
+[Install]
+WantedBy=multi-user.target

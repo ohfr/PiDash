@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import sys
+import subprocess
 
 WIDEBAND = 0x368
 SPEED = 0x370
@@ -20,16 +21,26 @@ class WorkerThread(QThread):
         with can.Bus(channel='can0', bustype='socketcan') as bus:
             bus.set_filters([{ 'can_id': 0x3E0, 'can_mask': 0x3E1, 'extended': False }, { 'can_id': 0x360, 'can_mask': 0x360, 'extended': False }, { 'can_id': 0x370, 'can_mask': 0x371, 'extended': False }, { 'can_id': 0x368, 'can_mask': 0x368, 'extended': False }])
             while True:
-                def convert(bytes, type):
+                def convert(bytes: list, type):
+                    if bytes[0] == None and bytes[1] == None:
+                        return 0
+                    if bytes[0] == None:
+                        bytes[0] = 0
+                    if bytes[1] == None:
+                        bytes[1] = 0
                     num = int.from_bytes(bytes, 'big')
+                    print(num)
                     if type == 'kelvin':
                         num *= .1
                         return  (num - 273.15) * 9/5 + 32
                     if type == 'lambda':
                         num *= .001
+                        num *= 14.71
                         return num
                     if type == 'KPA':
-                        num*= 10
+                        num*= .1
+                        if num <= 100:
+                            return -(num*.01)
                         return num//6.895
                     if type == 'KMH':
                         num *= 10
@@ -52,10 +63,23 @@ class WorkerThread(QThread):
                     elif msg.arbitration_id == SPEED:
                         self.update_speed.emit(convert(msg.data[:2], 'KMH'))
                         print('SPEED: {}'.format(convert(msg.data[:2], 'KMH')))
+
+                # For testing purposes on a non CAN capable device
+                # def test():
+                #     self.update_coolant.emit(randrange(175, 190))
+                #     self.update_airTemp.emit(randrange(90, 120))
+                #     self.update_airFuel.emit(randrange(10, 22))
+                #     self.update_boost.emit(randrange(-18, 20))
+                #     self.update_rpm.emit(randrange(0, 9000))
+                #     self.update_speed.emit(randrange(0, 200))
+
+                # test()
                 notifier = can.Notifier(bus, [prettyPrint])
                 time.sleep(.5)
 
 def main():
+    # start the can bus
+    subprocess.run(['sudo', '/sbin/ip', 'link', 'set', 'can0', 'up', 'type', 'can', 'bitrate', '1000000'])
     app = QApplication(sys.argv)
     win = QMainWindow()
     win.setWindowTitle("PiDash")
@@ -126,7 +150,7 @@ def main():
     worker.update_airFuel.connect(updateAFR)
     worker.update_rpm.connect(updateRpm)
     worker.update_speed.connect(updateSpeed)
-    worker.update_boost.connet(updateBoost)
+    worker.update_boost.connect(updateBoost)
     sys.exit(app.exec_())
 
 
