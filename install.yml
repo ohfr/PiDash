@@ -1,11 +1,11 @@
 ---
-  - hosts: all
+  - hosts: localhost
     become: yes
     become_user: root
     become_method: sudo
     tasks:
       - name: Install Venv & pyqt5
-        command: sudo apt-get install pyqt5 && python3 -m pip install venv
+        command: sudo apt-get install python3-pyqt5 && python3 -m pip install venv
       - name: Start virtualenv and Install requirements
         command: source /env/bin/activate && python3 -m pip install -r requirements.txt
       - name: Copy service file
