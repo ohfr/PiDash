@@ -5,6 +5,7 @@ After=graphical.target
 [Service]
 ExecStart=/usr/bin/python3 /home/pi/Documents/pidash/dash.py
 User=pi
+Restart=always
 Environment="DISPLAY=:0"
 
 [Install]
