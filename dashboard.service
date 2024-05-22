@@ -1,0 +1,14 @@
+[Unit]
+Description=PiDashboard
+After=graphical.target
+
+[Service]
+ExecStart=/usr/bin/npm start --prefix /home/pi/Documents/pidash/dashboard
+Environment=CI=true
+WorkingDirectory=/home/pi/Documents/pidash/dashboard
+User=pi
+Restart=always
+Environment="DISPLAY=:0"
+
+[Install]
+WantedBy=graphical.target

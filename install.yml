@@ -7,8 +7,10 @@
       app_path: "/home/pi/Documents/pidash"
       virtualenvPath: "{{ app_path }}/env"
     tasks:
-      - name: Install virtualenv & pyqt5
-        command: sudo apt-get install python3-pyqt5 && python3 -m pip install virtualenv
+      - name: 'Install node'
+        command: 'sudo apt install nodejs npm'
+      - name: Install virtualenv 
+        command: python3 -m pip install virtualenv
       - name: Create virtual env
         command: python3 -m venv {{virtualenvPath}}
       - name: Start virtualenv
@@ -17,9 +19,16 @@
         pip:
           requirements: "{{ app_path }}/requirements.txt"
           virtualenv: "{{ virtualenvPath }}"
-      - name: Copy service file
+      - name: Install npm packages
+        community.general.npm:
+          path: /home/pi/Documents/pidash/dashboard
+      - name: Copy dash service file
         copy: src=pidash.service dest=/lib/systemd/system/pidash.service mode=0644
+      - name: Copy dashboard service file
+        copy: src=dashboard.service dest=/lib/systemd/system/dashboard.service mode=0644
       - name: Reload daemon
         systemd: daemon_reload=true
+      - name: Start Dashboard as daemon
+        systemd: name=dashboard state=started
       - name: Start PiDash as daemon
         systemd: name=pidash state=started
