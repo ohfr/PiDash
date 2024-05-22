@@ -1,12 +1,12 @@
 [Unit]
 Description=PiDash
-After=graphical.target
+After=default.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/Documents/pidash/dashSocket.py
+ExecStart=/home/pi/Documents/pidash/env/bin/python /home/pi/Documents/pidash/dashSocket.py
 User=pi
 Restart=always
 Environment="DISPLAY=:0"
 
 [Install]
-WantedBy=graphical.target
+WantedBy=default.target
