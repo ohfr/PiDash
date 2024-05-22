@@ -7,7 +7,7 @@
       app_path: "/home/pi/Documents/pidash"
       virtualenvPath: "{{ app_path }}/env"
     tasks:
-      - name: 'Install node'
+      - name: Install node
         command: 'sudo apt install nodejs npm'
       - name: Install virtualenv 
         command: python3 -m pip install virtualenv
