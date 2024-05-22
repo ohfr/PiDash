@@ -20,8 +20,7 @@
           requirements: "{{ app_path }}/requirements.txt"
           virtualenv: "{{ virtualenvPath }}"
       - name: Install npm packages
-        community.general.npm:
-          path: /home/pi/Documents/pidash/dashboard
+        command: cd /home/pi/Documents/pidash/dashboard && npm i
       - name: Copy dash service file
         copy: src=pidash.service dest=/lib/systemd/system/pidash.service mode=0644
       - name: Copy dashboard service file
