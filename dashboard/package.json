@@ -10,6 +10,9 @@
     "@types/node": "^16.18.97",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
+    "cors": "^2.8.5",
+    "electron-is-dev": "^3.0.1",
+    "express": "^4.19.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-gauge-component": "^1.2.21",
@@ -18,11 +21,15 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+  "main": "electron-starter.js",
+  "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev": "concurrently -k \"BROWSER=none npm run start\" \"npm run electron\"",
+    "electron": "electron ."
   },
   "eslintConfig": {
     "extends": [
@@ -41,5 +48,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^30.0.6",
+    "wait-on": "^7.2.0"
   }
 }

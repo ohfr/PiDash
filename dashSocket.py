@@ -58,19 +58,24 @@ async def send(msg):
         print('SPEED: {}'.format(convert(msg.data[:2], 'KMH')))
 
 async def background_task():
-    with can.Bus('test', interface='virtual', receive_own_messages=True) as bus:
-        bus.set_filters([{ 'can_id': 0x3E0, 'can_mask': 0x3E1, 'extended': False }, { 'can_id': 0x360, 'can_mask': 0x360, 'extended': False }, { 'can_id': 0x370, 'can_mask': 0x371, 'extended': False }, { 'can_id': 0x368, 'can_mask': 0x368, 'extended': False }])
-        loop = asyncio.get_running_loop()
-        reader = can.AsyncBufferedReader()
-        listeners = [
-            send,
-            reader
-        ]
-        notifier = can.Notifier(bus, listeners, loop=loop)
+    # with can.Bus('test', interface='virtual', receive_own_messages=True) as bus:
+    #     bus.set_filters([{ 'can_id': 0x3E0, 'can_mask': 0x3E1, 'extended': False }, { 'can_id': 0x360, 'can_mask': 0x360, 'extended': False }, { 'can_id': 0x370, 'can_mask': 0x371, 'extended': False }, { 'can_id': 0x368, 'can_mask': 0x368, 'extended': False }])
+    #     loop = asyncio.get_running_loop()
+    #     reader = can.AsyncBufferedReader()
+    #     listeners = [
+    #         send,
+    #         reader
+    #     ]
+    #     notifier = can.Notifier(bus, listeners, loop=loop)
             
-        await reader.get_message()
-        notifier.stop()
-        await sio.sleep(1)
+    #     await reader.get_message()
+    #     notifier.stop()
+    #     await sio.sleep(1)
+    i = 1
+    while True:
+        await sio.emit('dashEvent', { 'rpm': i, 'boost': i })
+        i+= 10
+        await sio.sleep(.1)
 
 @sio.event
 async def connect(sid, environ):
@@ -86,7 +91,7 @@ def disconnect(sid):
 
 async def init_app():
     # start the can bus
-    subprocess.run(['sudo', '/sbin/ip', 'link', 'set', 'can0', 'up', 'type', 'can', 'bitrate', '1000000'])
+    # subprocess.run(['sudo', '/sbin/ip', 'link', 'set', 'can0', 'up', 'type', 'can', 'bitrate', '1000000'])
 
     sio.start_background_task(background_task)
     return app

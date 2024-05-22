@@ -1,0 +1,5 @@
+#! /bin/bash
+
+cd /home/pi/Documents/pidash/dasboard
+
+npm run electron
