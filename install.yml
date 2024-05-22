@@ -20,7 +20,7 @@
       - name: Install npm packages
         command: cd /home/pi/Documents/pidash/dashboard && npm i
       - name: Copy dash service file
-        copy: src=pidash.service dest=/lib/systemd/system/pidash.service mode=0644
+        copy: src=pidash.service dest=/lib/systemd/system/dash.service mode=0644
       - name: Copy dashboard service file
         copy: src=dashboard.service dest=/lib/systemd/system/dashboard.service mode=0644
       - name: Reload daemon
