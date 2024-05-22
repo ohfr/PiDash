@@ -3,7 +3,7 @@ Description=PiDash
 After=graphical.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/Documents/pidash/dash.py
+ExecStart=/usr/bin/python3 /home/pi/Documents/pidash/dashSocket.py
 User=pi
 Restart=always
 Environment="DISPLAY=:0"
