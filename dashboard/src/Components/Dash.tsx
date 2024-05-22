@@ -4,7 +4,7 @@ import { DashEvent } from '../types';
 export default function Dash ({ events }: { events: DashEvent }) {
     return (
         <div
-        style={{ display: 'flex', alignItems: 'center' }}> 
+        style={{ display: 'flex', alignItems: 'center', minHeight: '100vh' }}> 
             <GaugeComponent
                 minValue={0}
                 maxValue={8000}

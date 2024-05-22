@@ -28,7 +28,7 @@ function App() {
     }
   }, [])
   return (
-    <div className="App" style={{ backgroundColor: 'black' }}>
+    <div className="App" style={{  minHeight: '100vh'}}>
         <Dash events = { events } />
     </div>
   );
