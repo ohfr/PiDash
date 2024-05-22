@@ -3,6 +3,5 @@ PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.12.1
 python-can==4.2.2
-pywin32==306
 typing_extensions==4.7.1
 wrapt==1.15.0
