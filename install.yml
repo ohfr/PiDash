@@ -13,8 +13,6 @@
         command: python3 -m pip install virtualenv
       - name: Create virtual env
         command: python3 -m venv {{virtualenvPath}}
-      - name: Start virtualenv
-        command: source {{virtualenvPath}}/bin/activate
       - name: Install requirements
         pip:
           requirements: "{{ app_path }}/requirements.txt"
