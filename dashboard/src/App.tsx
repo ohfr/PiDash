@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { socket } from './socket';
 import Dash from './Components/Dash';
@@ -16,15 +15,22 @@ function App() {
   });
   useEffect(() => {
     function dashEvent (data: DashEvent) {
+      console.log('event');
         setEvents({
           ...events,
           ...data
         });
     }
+    function ping() {
+      socket.emit('ping');
+    }
     socket.on('dashEvent', dashEvent);
+
+    socket.on('connect', ping);
 
     return () => {
       socket.off('dashEvent', dashEvent)
+      socket.off('connect', ping)
     }
   }, [])
   return (

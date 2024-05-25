@@ -43,7 +43,6 @@ def convert(bytes: list, type):
     
 async def send(msg):
     if msg.arbitration_id == COOLANT_AIR_TEMP:
-        # SEND TO A FRONT END VIA SOCKETIO
         print('coolant: {}'.format(convert(msg.data[:2], 'kelvin')))
         print('air temp: {}'.format(convert(msg.data[2:4], 'kelvin')))
         await sio.emit('dashEvent', { 'coolant': convert(msg.data[:2], 'kelvin'), 'airTemp': convert(msg.data[2:4], 'kelvin') })
@@ -52,35 +51,27 @@ async def send(msg):
         print('RPMS: {}'.format(int.from_bytes(msg.data[:2], 'big')))
         print('MAP (Boost): {}'.format(convert(msg.data[2:4], 'KPA')))
     elif msg.arbitration_id == WIDEBAND:
-        # self.update_airFuel.emit(convert(msg.data[:2], 'lambda'))
         await sio.emit('dashEvent', { 'afr': convert(msg.data[:2], 'lambda') })
         print('AFR: {}'.format(convert(msg.data[:2], 'lambda')))
     elif msg.arbitration_id == SPEED:
-        # self.update_speed.emit(convert(msg.data[:2], 'KMH'))
         await sio.emit('dashEvent', { 'speed': convert(msg.data[:2], 'KMH')})
         print('SPEED: {}'.format(convert(msg.data[:2], 'KMH')))
 
 async def background_task():
     try:
         print('started task')
-        loop = asyncio.get_running_loop()
-        # reader = can.AsyncBufferedReader()
         with can.Bus(channel='can0', bustype='socketcan') as bus:
+            loop = asyncio.get_running_loop()
             global notifier
-            notifier = can.Notifier(bus, [send], loop=loop)
+            reader = can.AsyncBufferedReader()
+            notifier = can.Notifier(bus, [reader], loop=loop)
+            while True:
+                msg = await reader.get_message()
+                await send(msg)
+                await asyncio.sleep(1)
     except KeyboardInterrupt:
         notifier.stop()
         print('Stopped task')
-        # await reader.get_message()
-        # notifier.stop()
-        # msg = bus.recv()
-        # if msg != None:
-        #     await send(msg)
-    # i = 1
-    # while True:
-    #     await sio.emit('dashEvent', { 'rpm': i, 'boost': i })
-    #     i+= 10
-    #     await sio.sleep(.1)
 
 @sio.event
 async def connect(sid, environ):
@@ -103,4 +94,4 @@ async def init_app():
 
 
 if __name__ == '__main__':
-    web.run_app(init_app(), port=5000)
+    web.run_app(asyncio.run(init_app()), port=5000)
