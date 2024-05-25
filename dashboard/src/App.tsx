@@ -5,37 +5,56 @@ import Dash from './Components/Dash';
 import { DashEvent } from './types';
 
 function App() {
-  const [events, setEvents] = useState<DashEvent>({
-    speed: 0,
-    rpm: 0,
-    coolant: 0,
-    afr: 0,
-    boost: 0,
-    airTemp: 0
-  });
+  const [afr, setAfr] = useState(0);
+  const [boost, setBoost] = useState(0);
+  const [coolant, setCoolant] = useState(0);
+  const [rpm, setRpm] = useState(0);
+  const [airTemp, setAirTemp] = useState(0);
+  const [speed, setSpeed] = useState(0);
+
   useEffect(() => {
     function dashEvent (data: DashEvent) {
-      console.log('event');
-        setEvents({
-          ...events,
-          ...data
-        });
+        for (const [key, value] of Object.entries(data)) {
+          switch (key){
+              case 'boost': {
+                  setBoost(value)
+                  break;
+              }
+              case 'afr': {
+                  setAfr(value)
+                  break;
+              }
+              case 'coolant': {
+                  setCoolant(value);
+                  break;
+              }
+              case 'rpm': {
+                  setRpm(value);
+                  break;
+              }
+              case 'airTemp': {
+                setAirTemp(value);
+                break;
+              }
+              case 'speed': {
+                setSpeed(value);
+                break;
+              }
+              default:
+                  return;
+          }
+      }
     }
-    function ping() {
-      socket.emit('ping');
-    }
-    socket.on('dashEvent', dashEvent);
 
-    socket.on('connect', ping);
+    socket.on('dashEvent', dashEvent);
 
     return () => {
       socket.off('dashEvent', dashEvent)
-      socket.off('connect', ping)
     }
-  }, [])
+  }, [rpm, boost, afr, speed, airTemp, coolant])
   return (
     <div className="App" style={{  minHeight: '100vh'}}>
-        <Dash events = { events } />
+        <Dash events = { { boost, afr, coolant, rpm, airTemp, speed } } />
     </div>
   );
 }

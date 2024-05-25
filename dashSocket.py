@@ -14,9 +14,6 @@ app = web.Application()
 sio.attach(app)
 notifier = None
 
-# bus = can.Bus(channel='can0', bustype='socketcan')
-# bus.set_filters([{ 'can_id': 0x3E0, 'can_mask': 0x3E1, 'extended': False }, { 'can_id': 0x360, 'can_mask': 0x360, 'extended': False }, { 'can_id': 0x370, 'can_mask': 0x371, 'extended': False }, { 'can_id': 0x368, 'can_mask': 0x368, 'extended': False }])
-
 def convert(bytes: list, type):
     if bytes[0] == None and bytes[1] == None:
         return 0
@@ -68,7 +65,6 @@ async def background_task():
             while True:
                 msg = await reader.get_message()
                 await send(msg)
-                await asyncio.sleep(1)
     except KeyboardInterrupt:
         notifier.stop()
         print('Stopped task')
@@ -92,6 +88,5 @@ async def init_app():
     sio.start_background_task(background_task)
     return app
 
-
 if __name__ == '__main__':
-    web.run_app(asyncio.run(init_app()), port=5000)
+    asyncio.run(web.run_app(init_app(), port=5000))
