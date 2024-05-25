@@ -12,9 +12,10 @@ COOLANT_AIR_TEMP = 0x3E0
 sio = socketio.AsyncServer(async_mode='aiohttp', cors_allowed_origins='*')
 app = web.Application()
 sio.attach(app)
+notifier = None
 
-bus = can.Bus(channel='can0', bustype='socketcan')
-bus.set_filters([{ 'can_id': 0x3E0, 'can_mask': 0x3E1, 'extended': False }, { 'can_id': 0x360, 'can_mask': 0x360, 'extended': False }, { 'can_id': 0x370, 'can_mask': 0x371, 'extended': False }, { 'can_id': 0x368, 'can_mask': 0x368, 'extended': False }])
+# bus = can.Bus(channel='can0', bustype='socketcan')
+# bus.set_filters([{ 'can_id': 0x3E0, 'can_mask': 0x3E1, 'extended': False }, { 'can_id': 0x360, 'can_mask': 0x360, 'extended': False }, { 'can_id': 0x370, 'can_mask': 0x371, 'extended': False }, { 'can_id': 0x368, 'can_mask': 0x368, 'extended': False }])
 
 def convert(bytes: list, type):
     if bytes[0] == None and bytes[1] == None:
@@ -60,16 +61,21 @@ async def send(msg):
         print('SPEED: {}'.format(convert(msg.data[:2], 'KMH')))
 
 async def background_task():
-    while True:
-        # loop = asyncio.get_running_loop()
+    try:
+        print('started task')
+        loop = asyncio.get_running_loop()
         # reader = can.AsyncBufferedReader()
-        # notifier = can.Notifier(bus, [send], loop=loop)
-            
+        with can.Bus(channel='can0', bustype='socketcan') as bus:
+            global notifier
+            notifier = can.Notifier(bus, [send], loop=loop)
+    except KeyboardInterrupt:
+        notifier.stop()
+        print('Stopped task')
         # await reader.get_message()
         # notifier.stop()
-        msg = bus.recv()
-        if msg != None:
-            await send(msg)
+        # msg = bus.recv()
+        # if msg != None:
+        #     await send(msg)
     # i = 1
     # while True:
     #     await sio.emit('dashEvent', { 'rpm': i, 'boost': i })
